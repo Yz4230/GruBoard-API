@@ -1,0 +1,21 @@
+version: "3"
+services:
+  database:
+    image: postgres:12.1-alpine
+    environment:
+      - POSTGRES_USER=yz
+      - POSTGRES_PASSWORD=805880
+      - POSTGRES_DB=yzdb
+    tty: true
+    ports:
+      - 5433:5432
+  python:
+    build: .
+    working_dir: /app
+    volumes:
+      - ./:/app/
+    tty: true
+    ports:
+      - 8000:8000
+    depends_on:
+      - database
