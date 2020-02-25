@@ -1,8 +1,6 @@
-from django.test import TestCase, Client
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APIClient, APITestCase
-
 
 # Create your tests here.
 from openboard.models import Board
@@ -10,7 +8,6 @@ from openboard.models import Board
 
 class CrudBoard(APITestCase):
     def setUp(self) -> None:
-        self.client = Client()
         self.api_client = APIClient()
         self.test_new_board_props = {
             "title": "Get test board",
