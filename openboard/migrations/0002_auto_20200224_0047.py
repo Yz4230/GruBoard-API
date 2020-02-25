@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='board',
             name='admin_auth',
-            field=models.CharField(default=openboard.models.createAdminAuth, max_length=32),
+            field=models.CharField(default=openboard.models.create_admin_auth, max_length=32),
         ),
     ]

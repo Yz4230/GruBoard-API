@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Message',
             fields=[
-                ('id', models.CharField(default=openboard.models.createId, max_length=8, primary_key=True, serialize=False)),
+                ('id', models.CharField(default=openboard.models.create_id, max_length=8, primary_key=True, serialize=False)),
                 ('author', models.CharField(max_length=64)),
                 ('content', models.CharField(max_length=1024)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),

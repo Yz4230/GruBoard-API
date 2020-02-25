@@ -16,19 +16,19 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Board',
             fields=[
-                ('id', models.CharField(default=openboard.models.createId, max_length=8, primary_key=True, serialize=False)),
+                ('id', models.CharField(default=openboard.models.create_id, max_length=8, primary_key=True, serialize=False)),
                 ('title', models.CharField(max_length=128)),
                 ('description', models.CharField(max_length=256, null=True)),
-                ('admin_auth', models.CharField(default=openboard.models.createAdminAuth, max_length=8)),
+                ('admin_auth', models.CharField(default=openboard.models.create_admin_auth, max_length=8)),
             ],
         ),
         migrations.CreateModel(
             name='Auth',
             fields=[
-                ('id', models.CharField(default=openboard.models.createId, max_length=8, primary_key=True, serialize=False)),
+                ('id', models.CharField(default=openboard.models.create_id, max_length=8, primary_key=True, serialize=False)),
                 ('title', models.CharField(max_length=128)),
                 ('description', models.CharField(max_length=256, null=True)),
-                ('auth', models.CharField(default=openboard.models.createAuth, max_length=16)),
+                ('auth', models.CharField(default=openboard.models.create_auth, max_length=16)),
                 ('board', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='openboard.Board')),
             ],
         ),
