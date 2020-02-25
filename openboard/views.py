@@ -18,14 +18,7 @@ class BoardViewSet(viewsets.GenericViewSet,
     queryset = Board.objects.all()
     serializer_class = BoardSerializer
 
-    def initial(self, request, *args, **kwargs):
-        super().initial(request, *args, **kwargs)
-        board = Board.objects.get(id=self.kwargs["pk"])
-        auth = request.query_params.get("auth", None)
-        board.authenticate(auth)
-
     def retrieve(self, request: Request, *args, **kwargs):
-        super().initial(request, *args, **kwargs)
         board = Board.objects.get(id=self.kwargs["pk"])
         serializer = self.get_serializer(board)
         return Response(serializer.data)
