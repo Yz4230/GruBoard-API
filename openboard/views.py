@@ -12,8 +12,8 @@ from .serializers import BoardSerializer, MessageSerializer
 
 class BoardViewSet(viewsets.GenericViewSet,
                    mixins.CreateModelMixin,
-                   mixins.UpdateModelMixin,
                    mixins.RetrieveModelMixin,
+                   mixins.UpdateModelMixin,
                    mixins.DestroyModelMixin):
     queryset = Board.objects.all()
     serializer_class = BoardSerializer
