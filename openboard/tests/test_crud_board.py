@@ -81,7 +81,7 @@ class BadRequest(APITestCase):
 
     def test_get_board_list(self):
         res: Response = self.api_client.get("/api/boards/")
-        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_not_exist_board(self):
         res: Response = self.api_client.get(f"/api/boards/{'0' * 8}/?auth={'0' * 32}")
@@ -89,4 +89,4 @@ class BadRequest(APITestCase):
 
     def test_get_board_with_no_auth(self):
         res: Response = self.api_client.get(f"/api/boards/{self.test_board_id}/")
-        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)

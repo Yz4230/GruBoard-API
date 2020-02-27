@@ -12,7 +12,9 @@ from .serializers import BoardSerializer, MessageSerializer
 # Create your views here.
 def check_board_auth(board_id: str, auth: str) -> None:
     board: Board = get_object_or_404(Board, id=board_id)
-    auth_list = [a.auth for a in board.auth_set.all()].append(board.admin_auth)
+    if auth == board.admin_auth:
+        return
+    auth_list = [a.auth for a in board.auth_set.all()]
     if auth not in auth_list:
         raise exceptions.NotAuthenticated()
 
@@ -27,7 +29,8 @@ class BoardViewSet(viewsets.GenericViewSet,
 
     def initial(self, request: Request, *args, **kwargs):
         super().initial(request, *args, **kwargs)
-        # check_board_auth(kwargs.get("pk"), request.query_params.get("pk"))
+        if request.method != "POST":
+            check_board_auth(kwargs.get("pk"), request.query_params.get("auth"))
 
 
 class MessageViewSet(viewsets.ModelViewSet):
