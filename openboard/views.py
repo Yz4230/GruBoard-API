@@ -37,6 +37,10 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
 
+    def initial(self, request: Request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        check_board_auth(kwargs.get("board_pk"), request.query_params.get("auth"))
+
     def create(self, request, *args, **kwargs):
         assert isinstance(request.data, dict)
         request.data["board"] = Board.objects.get(id=kwargs["board_pk"])

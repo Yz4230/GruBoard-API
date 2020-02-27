@@ -1,6 +1,8 @@
+from pprint import pprint
+
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.test import APIClient, APITestCase
+from rest_framework.test import APITestCase
 
 # Create your tests here.
 from openboard.models import Board
@@ -8,7 +10,6 @@ from openboard.models import Board
 
 class ProperRequest(APITestCase):
     def setUp(self) -> None:
-        self.api_client = APIClient()
         self.test_board_props = {
             "title": "Get test board",
             "description": "testing..."
@@ -22,11 +23,11 @@ class ProperRequest(APITestCase):
             "title": "This is the test board.",
             "description": "This board is created for testing."
         }
-        res = self.api_client.post("/api/boards/", board_props, format="json")
+        res = self.client.post("/api/boards/", board_props, format="json")
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
     def test_read(self):
-        res: Response = self.api_client.get(
+        res: Response = self.client.get(
             f"/api/boards/{self.test_board_id}/?auth={self.test_board_admin_auth}",
             format="json"
         )
@@ -38,7 +39,7 @@ class ProperRequest(APITestCase):
         new_props = {
             "title": "Updated test board!"
         }
-        res: Response = self.api_client.put(
+        res: Response = self.client.put(
             f"/api/boards/{self.test_board_id}/?auth={self.test_board_admin_auth}",
             data=new_props,
             format="json"
@@ -47,7 +48,7 @@ class ProperRequest(APITestCase):
         self.assertEqual(res.data["title"], new_props["title"])
 
     def test_destroy(self):
-        res: Response = self.api_client.delete(
+        res: Response = self.client.delete(
             f"/api/boards/{self.test_board_id}/?auth={self.test_board_admin_auth}",
             format="json"
         )
@@ -56,7 +57,6 @@ class ProperRequest(APITestCase):
 
 class BadRequest(APITestCase):
     def setUp(self) -> None:
-        self.api_client = APIClient()
         self.test_board_props = {
             "id": "A1B2C3D4",
             "admin_auth": "A1B2" * 8,
@@ -68,11 +68,11 @@ class BadRequest(APITestCase):
         self.test_board_admin_auth = board.admin_auth
 
     def test_create_with_no_props(self):
-        res: Response = self.api_client.post("/api/boards/", format="json")
+        res: Response = self.client.post("/api/boards/", format="json")
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_without_title(self):
-        res: Response = self.api_client.post(
+        res: Response = self.client.post(
             "/api/boards/",
             {"description": "Some description..."},
             format="json"
@@ -80,13 +80,17 @@ class BadRequest(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_board_list(self):
-        res: Response = self.api_client.get("/api/boards/")
+        res: Response = self.client.get("/api/boards/")
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_not_exist_board(self):
-        res: Response = self.api_client.get(f"/api/boards/{'0' * 8}/?auth={'0' * 32}")
+        res: Response = self.client.get(f"/api/boards/{'0' * 8}/?auth={'0' * 32}")
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_board_with_no_auth(self):
-        res: Response = self.api_client.get(f"/api/boards/{self.test_board_id}/")
+        res: Response = self.client.get(f"/api/boards/{self.test_board_id}/")
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_get_board_with_invalid_auth(self):
+        res: Response = self.client.get(f"/api/boards/{self.test_board_id}/?auth={'0' * 32}")
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
