@@ -1,13 +1,20 @@
+from pprint import pprint
+
+from rest_framework import exceptions
 from rest_framework import viewsets, mixins
-from rest_framework.exceptions import NotFound
+from rest_framework.generics import get_object_or_404
 from rest_framework.request import Request
-from rest_framework.response import Response
 
 from .models import Board, Message
 from .serializers import BoardSerializer, MessageSerializer
 
 
 # Create your views here.
+def check_board_auth(board_id: str, auth: str) -> None:
+    board: Board = get_object_or_404(Board, id=board_id)
+    auth_list = [a.auth for a in board.auth_set.all()].append(board.admin_auth)
+    if auth not in auth_list:
+        raise exceptions.NotAuthenticated()
 
 
 class BoardViewSet(viewsets.GenericViewSet,
@@ -18,18 +25,16 @@ class BoardViewSet(viewsets.GenericViewSet,
     queryset = Board.objects.all()
     serializer_class = BoardSerializer
 
-    def retrieve(self, request: Request, *args, **kwargs):
-        board = Board.objects.get(id=self.kwargs["pk"])
-        serializer = self.get_serializer(board)
-        return Response(serializer.data)
+    def initial(self, request: Request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        # check_board_auth(kwargs.get("pk"), request.query_params.get("pk"))
 
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
 
-    def initial(self, request, *args, **kwargs):
-        super().initial(request, *args, **kwargs)
-        board = Board.objects.get(id=kwargs["board_pk"])
-        auth = request.query_params.get("auth", None)
-        board.authenticate(auth)
+    def create(self, request, *args, **kwargs):
+        assert isinstance(request.data, dict)
+        request.data["board"] = Board.objects.get(id=kwargs["board_pk"])
+        return super().create(request, *args, **kwargs)

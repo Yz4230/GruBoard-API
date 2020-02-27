@@ -28,13 +28,6 @@ class Board(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
 
-    def authenticate(self, auth: str) -> None:
-        auth_codes: List[str] = [self.admin_auth]
-        if self.auth_set:
-            auth_codes += [a.auth for a in self.auth_set.all()]
-        if auth not in auth_codes:
-            raise NotFound
-
 
 class Auth(models.Model):
     id = models.CharField(primary_key=True, max_length=8, default=create_id, null=False, editable=False)
