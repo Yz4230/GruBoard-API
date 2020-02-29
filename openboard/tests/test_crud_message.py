@@ -1,15 +1,11 @@
-from pprint import pprint
-
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.test import APITestCase
-
-# Create your tests here.
-from openboard.models import Board
-
 
 # noinspection DuplicatedCode
 from openboard.tests.util import MessageTestCase
+
+
+# Create your tests here.
 
 
 class ProperRequest(MessageTestCase):

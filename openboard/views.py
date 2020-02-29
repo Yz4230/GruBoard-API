@@ -6,8 +6,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.request import Request
 
 from .models import Board, Message
-from .serializers.message import MessageSerializer
-from .serializers.board import BoardSerializer
+from .serializers import BoardSerializer, MessageSerializer
 
 
 # Create your views here.
