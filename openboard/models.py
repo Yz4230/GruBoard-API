@@ -1,9 +1,5 @@
-from typing import List
-
-from django.db import models
 import nanoid
-from rest_framework.exceptions import NotFound
-from django.http import Http404
+from django.db import models
 
 
 def create_id():
@@ -25,6 +21,7 @@ class Board(models.Model):
     title = models.CharField(max_length=128, null=False)
     description = models.CharField(max_length=256, null=True)
     admin_auth = models.CharField(max_length=32, default=create_admin_auth, null=False, editable=False)
+
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
 
@@ -35,6 +32,7 @@ class Auth(models.Model):
     description = models.CharField(max_length=256, null=True)
     auth = models.CharField(max_length=16, default=create_auth, null=False, editable=False)
     board = models.ForeignKey(Board, on_delete=models.CASCADE)
+
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
 
@@ -44,5 +42,6 @@ class Message(models.Model):
     author = models.CharField(max_length=64, null=False)
     content = models.CharField(max_length=1024, null=False)
     board = models.ForeignKey(Board, on_delete=models.CASCADE, editable=False)
+
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
