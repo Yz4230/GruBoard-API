@@ -1,13 +1,10 @@
 import nanoid
 from django.db import models
+from django.contrib.postgres.fields import JSONField
 
 
 def create_id():
     return nanoid.generate(size=8)
-
-
-def create_admin_auth():
-    return nanoid.generate(size=32)
 
 
 def create_auth():
@@ -16,32 +13,40 @@ def create_auth():
 
 # Create your models here.
 
+
 class Board(models.Model):
-    id = models.CharField(primary_key=True, max_length=8, default=create_id, null=False, editable=False)
     title = models.CharField(max_length=128, null=False)
     description = models.CharField(max_length=256, null=True)
-    admin_auth = models.CharField(max_length=32, default=create_admin_auth, null=False, editable=False)
 
+    id = models.CharField(primary_key=True, max_length=8, default=create_id, null=False, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
 
 
-class Auth(models.Model):
-    id = models.CharField(primary_key=True, max_length=8, default=create_id, null=False, editable=False)
+class Role(models.Model):
+    ROLE_TYPES = (
+        (0, "admin"),
+        (1, "editor"),
+        (2, "viewer")
+    )
+
     title = models.CharField(max_length=128, null=False)
     description = models.CharField(max_length=256, null=True)
     auth = models.CharField(max_length=16, default=create_auth, null=False, editable=False)
-    board = models.ForeignKey(Board, on_delete=models.CASCADE)
+    board = models.ForeignKey(Board, on_delete=models.CASCADE, editable=False)
+    type = models.IntegerField(choices=ROLE_TYPES, default=2)
 
+    id = models.CharField(primary_key=True, max_length=8, default=create_id, null=False, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
 
 
 class Message(models.Model):
-    id = models.CharField(primary_key=True, max_length=8, default=create_id, null=False, editable=False)
     author = models.CharField(max_length=64, null=False)
+    author_role = models.OneToOneField(Role, on_delete=models.DO_NOTHING, null=True)
     content = models.CharField(max_length=1024, null=False)
     board = models.ForeignKey(Board, on_delete=models.CASCADE, editable=False)
 
+    id = models.CharField(primary_key=True, max_length=8, default=create_id, null=False, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
