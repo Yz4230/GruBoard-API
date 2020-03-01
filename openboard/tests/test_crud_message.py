@@ -33,7 +33,7 @@ class ProperRequest(MessageTestCase):
 
     def test_read_one(self):
         res: Response = self.client.get(
-            f"/api/boards/{self.test_board.id}/messages/{self.test_message1.id}/?auth={self.test_role.auth}",
+            f"/api/boards/{self.test_board.id}/messages/{self.test_message1.id}/?auth={self.test_role_admin.auth}",
         )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data["id"], self.test_message1.id)
@@ -44,7 +44,7 @@ class ProperRequest(MessageTestCase):
             "content": "Goodnight World"
         }
         res: Response = self.client.put(
-            f"/api/boards/{self.test_board.id}/messages/{self.test_message2.id}/?auth={self.test_role.auth}",
+            f"/api/boards/{self.test_board.id}/messages/{self.test_message2.id}/?auth={self.test_role_admin.auth}",
             data=new_props,
             format="json"
         )
@@ -53,7 +53,7 @@ class ProperRequest(MessageTestCase):
 
     def test_destroy(self):
         res: Response = self.client.delete(
-            f"/api/boards/{self.test_board.id}/messages/{self.test_message1.id}/?auth={self.test_role.auth}",
+            f"/api/boards/{self.test_board.id}/messages/{self.test_message1.id}/?auth={self.test_role_admin.auth}",
             format="json"
         )
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
@@ -79,7 +79,7 @@ class BadRequest(MessageTestCase):
 
     def test_get_not_exist_message(self):
         res: Response = self.client.get(
-            f"/api/boards/{self.test_board.id}/messages/{'0' * 8}/?auth={self.test_role.auth}"
+            f"/api/boards/{self.test_board.id}/messages/{'0' * 8}/?auth={self.test_role_admin.auth}"
         )
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 

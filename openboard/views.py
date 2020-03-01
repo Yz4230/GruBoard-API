@@ -5,15 +5,14 @@ from rest_framework import viewsets, mixins
 from rest_framework.generics import get_object_or_404
 from rest_framework.request import Request
 
-from .models import Board, Message
-from .serializers import BoardSerializer, MessageSerializer
+from .models import Board, Message, Role
+from .serializers import BoardSerializer, MessageSerializer, RoleSerializer
 
 
 # Create your views here.
 def check_board_auth(board_id: str, auth: str) -> None:
     board: Board = get_object_or_404(Board, id=board_id)
-    auth_list = [a.auth for a in board.role_set.all()]
-    if auth not in auth_list:
+    if auth not in board.get_all_role_auth():
         raise exceptions.NotAuthenticated()
 
 
@@ -29,6 +28,15 @@ class BoardViewSet(viewsets.GenericViewSet,
         super().initial(request, *args, **kwargs)
         if request.method != "POST":
             check_board_auth(kwargs.get("pk"), request.query_params.get("auth"))
+
+
+class RoleViewSet(viewsets.ModelViewSet):
+    queryset = Role.objects.all()
+    serializer_class = RoleSerializer
+
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        board = Board.objects.get(id=kwargs.get("board_pk"))
 
 
 class MessageViewSet(viewsets.ModelViewSet):

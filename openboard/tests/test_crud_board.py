@@ -1,10 +1,10 @@
-from pprint import pprint
-
 from rest_framework import status
 from rest_framework.response import Response
 
-# Create your tests here.
 from openboard.tests.util import BoardTestCase
+
+
+# Create your tests here.
 
 
 class ProperRequest(BoardTestCase):

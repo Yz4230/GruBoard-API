@@ -11,7 +11,8 @@ def create_test_board(board_props=None, role_props=None) -> (Board, Role):
     :return: Board and Auth created instances
     """
     board = Board.objects.create(**(board_props or {}))
-    role = board.role_set.create(**(role_props or {}))
+    # Type 0 means admin
+    role = board.role_set.create(**(role_props or {}), type=0)
     return board, role
 
 
@@ -28,16 +29,16 @@ class BoardTestCase(APITestCase):
             "title": "Board used in test",
             "description": "testing..."
         }
-        self.test_role_props = {
+        self.test_role_admin_props = {
             "id": "authA1B2",
             "title": "Role used in auth",
             "description": "testing..."
         }
-        self.test_board, self.test_role = create_test_board(
+        self.test_board, self.test_role_admin = create_test_board(
             self.test_board_props,
-            self.test_role_props
+            self.test_role_admin_props
         )
-        self.test_url = f"/api/boards/{self.test_board.id}/?auth={self.test_role.auth}"
+        self.test_url = f"/api/boards/{self.test_board.id}/?auth={self.test_role_admin.auth}"
 
 
 class MessageTestCase(BoardTestCase):
@@ -52,6 +53,24 @@ class MessageTestCase(BoardTestCase):
             "author": "Mary",
             "content": "Cannot you see me?"
         }
-        self.test_message1 = create_test_message(self.test_board.id, self.test_message1_props)
-        self.test_message2 = create_test_message(self.test_board.id, self.test_message2_props)
-        self.test_url = f"/api/boards/{self.test_board.id}/messages/?auth={self.test_role.auth}"
+        self.test_message1 = self.test_board.message_set.create(**self.test_message1_props)
+        self.test_message2 = self.test_board.message_set.create(**self.test_message2_props)
+        self.test_url = f"/api/boards/{self.test_board.id}/messages/?auth={self.test_role_admin.auth}"
+
+
+class RoleTestCase(BoardTestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.test_role_editor_props = {
+            "title": "Test editor role",
+            "description": "Testing...",
+            "type": Role.RoleTypes.editor
+        }
+        self.test_role_viewer_props = {
+            "title": "Test viewer role",
+            "description": "Testing...",
+            "type": Role.RoleTypes.viewer
+        }
+        self.test_role_editor = self.test_board.role_set.create(**self.test_role_editor_props)
+        self.test_role_viewer = self.test_board.role_set.create(**self.test_role_viewer_props)
+        self.test_url = None

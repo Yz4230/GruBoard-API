@@ -1,5 +1,7 @@
 import nanoid
 from django.db import models
+from enumfields import EnumIntegerField
+from enum import IntEnum
 
 
 def create_id():
@@ -21,23 +23,28 @@ class Board(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
 
+    def get_all_role_auth(self):
+        return (r.auth for r in self.role_set.all())
+
 
 class Role(models.Model):
-    ROLE_TYPES = (
-        (0, "admin"),
-        (1, "editor"),
-        (2, "viewer")
-    )
+    class RoleTypes(IntEnum):
+        admin = 0
+        editor = 1
+        viewer = 2
 
     title = models.CharField(max_length=128, null=False)
     description = models.CharField(max_length=256, null=True)
     auth = models.CharField(max_length=16, default=create_auth, null=False, editable=False)
     board = models.ForeignKey(Board, on_delete=models.CASCADE, editable=False)
-    type = models.IntegerField(choices=ROLE_TYPES, default=2)
+    type = EnumIntegerField(enum=RoleTypes, default=RoleTypes.viewer)
 
     id = models.CharField(primary_key=True, max_length=8, default=create_id, null=False, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
+
+    def can_post(self) -> bool:
+        return self.type in (0, 1)
 
 
 class Message(models.Model):

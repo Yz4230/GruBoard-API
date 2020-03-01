@@ -3,11 +3,24 @@ from rest_framework import serializers
 from openboard.models import Role, Board, Message
 
 
-class RoleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Role
-        fields = ("id", "title", "description", "created_at", "modified_at")
-        read_only_fields = ("id", "created_at", "modified_at")
+class IntegerEnumChoicesField(serializers.Field):
+    default_error_messages = {
+        "invalid_choice": "'{input}' is not a valid choice."
+    }
+
+    def __init__(self, choices, **kwargs):
+        self.choices = choices
+        super().__init__(**kwargs)
+
+    def to_internal_value(self, data):
+        assert isinstance(data, str)
+        try:
+            return int(self.choices[data])
+        except KeyError:
+            self.fail('invalid_choice', input=data)
+
+    def to_representation(self, value):
+        return self.choices(value).name
 
 
 class BoardSerializer(serializers.ModelSerializer):
@@ -18,9 +31,24 @@ class BoardSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         board = Board.objects.create(**validated_data)
-        # Admin auth is numbered as 0.
+        # Admin auth is numbered as 0. 
         board.role_set.create(type=0)
         return board
+
+
+class RoleSerializer(serializers.ModelSerializer):
+    type = IntegerEnumChoicesField(Role.RoleTypes)
+
+    class Meta:
+        model = Role
+        fields = ("id", "title", "auth", "type", "description", "created_at", "modified_at")
+        read_only_fields = ("id", "auth", "created_at", "modified_at")
+
+    def create(self, validated_data):
+        kwargs = self.context["view"].kwargs
+        board_pk = kwargs["board_pk"]
+        board = Board.objects.get(id=board_pk)
+        return board.role_set.create(**validated_data)
 
 
 class MessageSerializer(serializers.ModelSerializer):
