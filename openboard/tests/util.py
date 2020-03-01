@@ -62,11 +62,13 @@ class RoleTestCase(BoardTestCase):
     def setUp(self) -> None:
         super().setUp()
         self.test_role_editor_props = {
+            "id": "editorA1",
             "title": "Test editor role",
             "description": "Testing...",
             "type": Role.RoleTypes.editor
         }
         self.test_role_viewer_props = {
+            "id": "viewerA1",
             "title": "Test viewer role",
             "description": "Testing...",
             "type": Role.RoleTypes.viewer

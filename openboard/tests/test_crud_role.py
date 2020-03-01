@@ -76,3 +76,62 @@ class ProperRequest(RoleTestCase):
             f"/api/boards/{self.test_board.id}/roles/{self.test_role_editor.id}/?auth={self.test_role_admin.auth}",
         )
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+
+
+class BadRequest(RoleTestCase):
+    def test_get_list_with_no_auth(self):
+        res: Response = self.client.get(
+            f"/api/boards/{self.test_board.id}/roles/"
+        )
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_get_list_as_editor(self):
+        res: Response = self.client.get(
+            f"/api/boards/{self.test_board.id}/roles/?auth={self.test_role_editor.auth}"
+        )
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_get_list_as_viewer(self):
+        res: Response = self.client.get(
+            f"/api/boards/{self.test_board.id}/roles/?auth={self.test_role_viewer.auth}"
+        )
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_get_one_with_no_auth(self):
+        res: Response = self.client.get(
+            f"/api/boards/{self.test_board.id}/roles/{self.test_role_viewer.id}/"
+        )
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_get_one_as_editor(self):
+        res: Response = self.client.get(
+            f"/api/boards/{self.test_board.id}/roles/{self.test_role_viewer.id}/?auth={self.test_role_editor.auth}"
+        )
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_get_one_as_viewer(self):
+        res: Response = self.client.get(
+            f"/api/boards/{self.test_board.id}/roles/{self.test_role_viewer.id}/?auth={self.test_role_viewer.auth}"
+        )
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_not_exists_auth(self):
+        res: Response = self.client.get(
+            f"/api/boards/{self.test_board.id}/roles/{'0' * 8}/?auth={self.test_role_admin.auth}"
+        )
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_create_with_no_props(self):
+        res: Response = self.client.post(
+            f"/api/boards/{self.test_board.id}/roles/?auth={self.test_role_admin.auth}",
+            format="json"
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_without_title(self):
+        res: Response = self.client.post(
+            f"/api/boards/{self.test_board.id}/roles/?auth={self.test_role_admin.auth}",
+            {"description": "Some description..."},
+            format="json"
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)

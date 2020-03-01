@@ -10,10 +10,17 @@ from .serializers import BoardSerializer, MessageSerializer, RoleSerializer
 
 
 # Create your views here.
-def check_board_auth(board_id: str, auth: str) -> None:
+def check_board_auth(board_id: str, auth: str) -> Board:
     board: Board = get_object_or_404(Board, id=board_id)
+    if auth is None:
+        raise exceptions.NotAuthenticated(
+            "The query 'auth' is required."
+        )
     if auth not in board.get_all_role_auth():
-        raise exceptions.NotAuthenticated()
+        raise exceptions.PermissionDenied(
+            "The auth is invalid."
+        )
+    return board
 
 
 class BoardViewSet(viewsets.GenericViewSet,
@@ -27,7 +34,9 @@ class BoardViewSet(viewsets.GenericViewSet,
     def initial(self, request: Request, *args, **kwargs):
         super().initial(request, *args, **kwargs)
         if request.method != "POST":
-            check_board_auth(kwargs.get("pk"), request.query_params.get("auth"))
+            board_id = kwargs.get("pk")
+            auth = request.query_params.get("auth")
+            check_board_auth(board_id, auth)
 
 
 class RoleViewSet(viewsets.ModelViewSet):
@@ -36,7 +45,15 @@ class RoleViewSet(viewsets.ModelViewSet):
 
     def initial(self, request, *args, **kwargs):
         super().initial(request, *args, **kwargs)
-        board = Board.objects.get(id=kwargs.get("board_pk"))
+        board_id = kwargs.get("board_pk")
+        auth = request.query_params.get("auth")
+        board = check_board_auth(board_id, auth)
+
+        role = board.role_set.get(auth=auth)
+        if role.type != Role.RoleTypes.admin:
+            raise exceptions.PermissionDenied(
+                "Only admin can crud auth."
+            )
 
 
 class MessageViewSet(viewsets.ModelViewSet):
@@ -45,4 +62,6 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def initial(self, request: Request, *args, **kwargs):
         super().initial(request, *args, **kwargs)
-        check_board_auth(kwargs.get("board_pk"), request.query_params.get("auth"))
+        board_id = kwargs.get("board_pk")
+        auth = request.query_params.get("auth")
+        check_board_auth(board_id, auth)
