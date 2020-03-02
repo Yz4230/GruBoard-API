@@ -49,8 +49,10 @@ class BoardViewSet(viewsets.GenericViewSet,
 
 
 class RoleViewSet(viewsets.ModelViewSet):
-    queryset = Role.objects.all()
     serializer_class = RoleSerializer
+
+    def get_queryset(self):
+        return Role.objects.filter(board_id=self.kwargs.get("board_pk"))
 
     def initial(self, request, *args, **kwargs):
         super().initial(request, *args, **kwargs)
@@ -60,8 +62,10 @@ class RoleViewSet(viewsets.ModelViewSet):
 
 
 class MessageViewSet(viewsets.ModelViewSet):
-    queryset = Message.objects.all()
     serializer_class = MessageSerializer
+
+    def get_queryset(self):
+        return Message.objects.filter(board_id=self.kwargs.get("board_pk"))
 
     def initial(self, request: Request, *args, **kwargs):
         super().initial(request, *args, **kwargs)
