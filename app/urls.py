@@ -18,7 +18,6 @@ from django.urls import path, include
 from openboard.urls import router, board_router
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path("api/", include(router.urls)),
     path("api/", include(board_router.urls))
 ]
