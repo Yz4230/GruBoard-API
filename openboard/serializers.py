@@ -34,13 +34,13 @@ class BoardSerializer(serializers.ModelSerializer):
         board.role_set.create(
             title="The Board Founder",
             description="This role was created together with board.",
-            type=Role.RoleTypes.admin
+            type=Role.Types.admin
         )
         return board
 
 
 class RoleSerializer(serializers.ModelSerializer):
-    type = IntegerEnumChoicesField(Role.RoleTypes)
+    type = IntegerEnumChoicesField(Role.Types)
 
     class Meta:
         model = Role

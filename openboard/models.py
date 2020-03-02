@@ -28,7 +28,7 @@ class Board(models.Model):
 
 
 class Role(models.Model):
-    class RoleTypes(IntEnum):
+    class Types(IntEnum):
         admin = 0
         editor = 1
         viewer = 2
@@ -37,7 +37,7 @@ class Role(models.Model):
     description = models.CharField(max_length=256, null=True)
     auth = models.CharField(max_length=16, default=create_auth, null=False, editable=False)
     board = models.ForeignKey(Board, on_delete=models.CASCADE, editable=False)
-    type = EnumIntegerField(enum=RoleTypes, default=RoleTypes.viewer)
+    type = EnumIntegerField(enum=Types, default=Types.viewer)
 
     id = models.CharField(primary_key=True, max_length=8, default=create_id, null=False, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)

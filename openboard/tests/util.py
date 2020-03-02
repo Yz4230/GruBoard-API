@@ -68,13 +68,13 @@ class RoleTestCase(BoardTestCase):
             "id": "editorA1",
             "title": "Test editor role",
             "description": "Testing...",
-            "type": Role.RoleTypes.editor
+            "type": Role.Types.editor
         }
         self.test_role_viewer_props = {
             "id": "viewerA1",
             "title": "Test viewer role",
             "description": "Testing...",
-            "type": Role.RoleTypes.viewer
+            "type": Role.Types.viewer
         }
         self.test_role_editor = self.test_board.role_set.create(**self.test_role_editor_props)
         self.test_role_viewer = self.test_board.role_set.create(**self.test_role_viewer_props)
@@ -107,7 +107,7 @@ class CombinedTestCase(APITestCase):
                 "title": self.faker.job(),
                 "description": self.faker.text(),
                 "auth": str(i).center(16, '0'),
-                "type": choice((Role.RoleTypes.admin, Role.RoleTypes.viewer, Role.RoleTypes.viewer))
+                "type": choice((Role.Types.admin, Role.Types.viewer, Role.Types.viewer))
             }
             ret.append(props)
         return ret
