@@ -1,5 +1,5 @@
 freeze:
-	pip freeze > reqs.txt
+	pip freeze > requirements.txt
 
 migrate:
 	python manage.py migrate
