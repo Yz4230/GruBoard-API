@@ -10,17 +10,12 @@ from .models import Board, Message, Role
 from .serializers import BoardSerializer, MessageSerializer, RoleSerializer
 
 
-# Create your views here.
-def check_board_auth(board_id: str, auth: str) -> Board:
+def require_auth(board_id: str, auth: str, *required_role_types) -> Board:
     board: Board = get_object_or_404(Board, id=board_id)
     if auth is None:
-        raise exceptions.NotAuthenticated(
-            "The query 'auth' is required."
-        )
-    if auth not in board.get_all_role_auth():
-        raise exceptions.PermissionDenied(
-            "The auth is invalid."
-        )
+        raise exceptions.NotAuthenticated("The query 'auth' is required.")
+    if not board.role_set.filter(auth=auth).filter(type__in=required_role_types).exists():
+        raise exceptions.PermissionDenied("Your role is not allowed to access.")
     return board
 
 
@@ -37,7 +32,7 @@ class BoardViewSet(viewsets.GenericViewSet,
         if request.method != "POST":
             board_id = kwargs.get("pk")
             auth = request.query_params.get("auth")
-            check_board_auth(board_id, auth)
+            require_auth(board_id, auth, Role.Types.admin)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -61,13 +56,7 @@ class RoleViewSet(viewsets.ModelViewSet):
         super().initial(request, *args, **kwargs)
         board_id = kwargs.get("board_pk")
         auth = request.query_params.get("auth")
-        board = check_board_auth(board_id, auth)
-
-        role = board.role_set.get(auth=auth)
-        if role.type != Role.RoleTypes.admin:
-            raise exceptions.PermissionDenied(
-                "Only admin can crud auth."
-            )
+        require_auth(board_id, auth, Role.Types.admin)
 
 
 class MessageViewSet(viewsets.ModelViewSet):
@@ -78,4 +67,16 @@ class MessageViewSet(viewsets.ModelViewSet):
         super().initial(request, *args, **kwargs)
         board_id = kwargs.get("board_pk")
         auth = request.query_params.get("auth")
-        check_board_auth(board_id, auth)
+        if request.method == "POST":
+            require_auth(
+                board_id, auth,
+                Role.Types.admin,
+                Role.Types.editor
+            )
+        else:
+            require_auth(
+                board_id, auth,
+                Role.Types.admin,
+                Role.Types.editor,
+                Role.Types.viewer
+            )
