@@ -55,9 +55,9 @@ class RoleSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    author_auth = serializers.CharField(
+    author_role = serializers.CharField(
         read_only=True,
-        source="author_auth.title"
+        source="author_role.title"
     )
 
     class Meta:
@@ -65,12 +65,12 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "author",
-            "author_auth",
+            "author_role",
             "content",
             "created_at",
             "modified_at"
         )
-        read_only_fields = ("id", "author_auth", "created_at", "modified_at")
+        read_only_fields = ("id", "author_role", "created_at", "modified_at")
 
     def create(self, validated_data):
         kwargs = self.context["view"].kwargs
