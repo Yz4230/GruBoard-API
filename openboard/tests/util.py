@@ -8,7 +8,7 @@ def create_test_board(board_props=None, role_props=None) -> (Board, Role):
     Create test board with the properties if they are specified.
     :param board_props: properties for test board
     :param role_props: properties for test role
-    :return: Board and Auth created instances
+    :return: Board and Role created instances
     """
     board = Board.objects.create(**(board_props or {}))
     # Type 0 means admin
