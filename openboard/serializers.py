@@ -26,13 +26,16 @@ class IntegerEnumChoicesField(serializers.Field):
 class BoardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
-        fields = ("id", "title", "description", "modified_at")
+        fields = ("id", "title", "description", "created_at", "modified_at")
         read_only_fields = ("id", "created_at", "modified_at")
 
     def create(self, validated_data):
         board = Board.objects.create(**validated_data)
-        # Admin auth is numbered as 0. 
-        board.role_set.create(type=0)
+        board.role_set.create(
+            title="The Board Founder",
+            description="This role was created together with board.",
+            type=Role.RoleTypes.admin
+        )
         return board
 
 

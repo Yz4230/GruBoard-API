@@ -1,6 +1,8 @@
 from rest_framework.test import APITestCase
-
+from faker import Faker
+from faker.providers import job, company
 from openboard.models import Role, Board, Message
+from random import choice
 
 
 def create_test_board(board_props=None, role_props=None) -> (Board, Role):
@@ -59,6 +61,7 @@ class MessageTestCase(BoardTestCase):
 
 
 class RoleTestCase(BoardTestCase):
+
     def setUp(self) -> None:
         super().setUp()
         self.test_role_editor_props = {
@@ -76,3 +79,46 @@ class RoleTestCase(BoardTestCase):
         self.test_role_editor = self.test_board.role_set.create(**self.test_role_editor_props)
         self.test_role_viewer = self.test_board.role_set.create(**self.test_role_viewer_props)
         self.test_url = None
+
+
+class CombinedTestCase(APITestCase):
+
+    def setUp(self) -> None:
+        self.faker = Faker(["ja_JP"])
+        self.faker.add_provider(job)
+        self.faker.add_provider(company)
+
+    def create_board_props(self, count):
+        ret = []
+        for i in range(count):
+            props = {
+                "id": str(i).zfill(8),
+                "title": self.faker.company(),
+                "description": self.faker.text()
+            }
+            ret.append(props)
+        return ret
+
+    def create_role_props(self, count):
+        ret = []
+        for i in range(count):
+            props = {
+                "id": str(i).zfill(8),
+                "title": self.faker.job(),
+                "description": self.faker.text(),
+                "auth": str(i).center(16, '0'),
+                "type": choice((Role.RoleTypes.admin, Role.RoleTypes.viewer, Role.RoleTypes.viewer))
+            }
+            ret.append(props)
+        return ret
+
+    def create_message_props(self, count):
+        ret = []
+        for i in range(count):
+            props = {
+                "id": str(i).zfill(8),
+                "author": self.faker.name(),
+                "content": self.faker.text()
+            }
+            ret.append(props)
+        return ret

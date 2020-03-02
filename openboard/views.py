@@ -1,9 +1,10 @@
 from pprint import pprint
 
-from rest_framework import exceptions
+from rest_framework import exceptions, status
 from rest_framework import viewsets, mixins
 from rest_framework.generics import get_object_or_404
 from rest_framework.request import Request
+from rest_framework.response import Response
 
 from .models import Board, Message, Role
 from .serializers import BoardSerializer, MessageSerializer, RoleSerializer
@@ -37,6 +38,19 @@ class BoardViewSet(viewsets.GenericViewSet,
             board_id = kwargs.get("pk")
             auth = request.query_params.get("auth")
             check_board_auth(board_id, auth)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+
+        role_serializer = RoleSerializer(instance=serializer.instance.role_set.first())
+        response_data = {
+            "created_board": serializer.data,
+            "created_role": role_serializer.data
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class RoleViewSet(viewsets.ModelViewSet):
