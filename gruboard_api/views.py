@@ -29,7 +29,7 @@ class BoardViewSet(viewsets.GenericViewSet,
 
     def initial(self, request: Request, *args, **kwargs):
         super().initial(request, *args, **kwargs)
-        if request.method != "POST":
+        if request.method not in ("POST", "OPTIONS"):
             board_id = kwargs.get("pk")
             auth = request.query_params.get("auth")
             require_auth(board_id, auth, Role.Types.admin)

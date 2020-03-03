@@ -33,6 +33,10 @@ class Role(models.Model):
         editor = 1
         viewer = 2
 
+        @classmethod
+        def items(cls):
+            return [(r.name, r.name.capitalize() + " role") for r in cls]
+
     title = models.CharField(max_length=128, null=False)
     description = models.CharField(max_length=256, null=True)
     auth = models.CharField(max_length=16, default=create_auth, null=False, editable=False)
