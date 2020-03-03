@@ -1,4 +1,4 @@
-# OpenBoard-API 説明書
+# GruBoard-API 説明書
 
 GruBoard-APIはGruBoardに関するCRUD操作を提供します。
 
