@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 
-from gruboard.tests.utils import BoardTestCase
+from gruboard_api.tests.utils import BoardTestCase
 
 
 # Create your tests here.

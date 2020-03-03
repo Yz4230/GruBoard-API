@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 # noinspection DuplicatedCode
-from gruboard.tests.utils import MessageTestCase
+from gruboard_api.tests.utils import MessageTestCase
 
 
 # Create your tests here.

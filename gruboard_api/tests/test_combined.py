@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .utils import CombinedTestCase
-from gruboard.models import Board
+from gruboard_api.models import Board
 
 
 class ProperScenario(CombinedTestCase):

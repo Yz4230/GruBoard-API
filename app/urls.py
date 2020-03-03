@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from gruboard.urls import router, board_router
+from gruboard_api.urls import router, board_router
 
 urlpatterns = [
     path("api/", include(router.urls)),
