@@ -49,7 +49,7 @@ class Role(models.Model):
 
 class Message(models.Model):
     author = models.CharField(max_length=64, null=False)
-    author_role = models.OneToOneField(Role, on_delete=models.DO_NOTHING, null=True)
+    author_role = models.ForeignKey(Role, on_delete=models.DO_NOTHING, null=True, related_name="+")
     content = models.CharField(max_length=1024, null=False)
     board = models.ForeignKey(Board, on_delete=models.CASCADE, editable=False)
 
