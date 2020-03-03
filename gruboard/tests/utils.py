@@ -1,7 +1,7 @@
 from rest_framework.test import APITestCase
 from faker import Faker
 from faker.providers import job, company
-from openboard.models import Role, Board, Message
+from gruboard.models import Role, Board, Message
 from random import choice
 
 

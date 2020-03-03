@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from openboard.models import Role, Board, Message
+from gruboard.models import Role, Board, Message
 
 
 class IntegerEnumChoicesField(serializers.Field):
