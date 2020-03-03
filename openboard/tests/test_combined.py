@@ -3,7 +3,7 @@ from pprint import pprint, pformat
 from rest_framework.response import Response
 from rest_framework import status
 
-from .util import CombinedTestCase
+from .utils import CombinedTestCase
 from openboard.models import Board
 
 
@@ -34,10 +34,18 @@ class ProperScenario(CombinedTestCase):
         )
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
-        res: Response = self.client.post(
-            f"/api/boards/{board_id}/messages/?auth={editor_auth}",
-            {"author": self.faker.name(),
-             "content": self.faker.text(32)}
+        for _ in range(10):
+            res: Response = self.client.post(
+                f"/api/boards/{board_id}/messages/?auth={editor_auth}",
+                {"author": self.faker.name(),
+                 "content": self.faker.text(32)}
+            )
+            self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+            print("Message created!\n", pformat((res.data["id"], res.data["author"])))
+
+        res: Response = self.client.get(
+            f"/api/boards/{board_id}/messages/?auth={admin_auth}"
         )
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        print("Message created!\n", pformat(res.data))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 10)
+        print("Message gotten!\n", pformat([(d["id"], d["author"]) for d in res.data]))

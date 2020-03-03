@@ -2,7 +2,7 @@ from pprint import pprint
 
 from rest_framework import status
 from rest_framework.response import Response
-from .util import RoleTestCase
+from .utils import RoleTestCase
 
 
 class ProperRequest(RoleTestCase):

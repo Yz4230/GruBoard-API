@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 # noinspection DuplicatedCode
-from openboard.tests.util import MessageTestCase
+from openboard.tests.utils import MessageTestCase
 
 
 # Create your tests here.

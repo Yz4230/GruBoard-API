@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 
-from openboard.tests.util import BoardTestCase
+from openboard.tests.utils import BoardTestCase
 
 
 # Create your tests here.
