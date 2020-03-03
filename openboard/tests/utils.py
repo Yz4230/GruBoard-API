@@ -87,12 +87,20 @@ class CombinedTestCase(APITestCase):
         self.faker = Faker(["ja_JP"])
         self.faker.add_provider(job)
         self.faker.add_provider(company)
+        self.create_dummy_data(10)
+
+    def create_dummy_data(self, count):
+        for bp in self.create_board_props(count):
+            board = Board.objects.create(**bp)
+            for rp in self.create_role_props(count):
+                role = board.role_set.create(**rp)
+                for mp in self.create_message_props(count):
+                    board.message_set.create(**mp, author_role=role)
 
     def create_board_props(self, count):
         ret = []
         for i in range(count):
             props = {
-                "id": str(i).zfill(8),
                 "title": self.faker.company(),
                 "description": self.faker.text()
             }
@@ -103,7 +111,6 @@ class CombinedTestCase(APITestCase):
         ret = []
         for i in range(count):
             props = {
-                "id": str(i).zfill(8),
                 "title": self.faker.job(),
                 "description": self.faker.text(),
                 "auth": str(i).center(16, '0'),
@@ -116,7 +123,6 @@ class CombinedTestCase(APITestCase):
         ret = []
         for i in range(count):
             props = {
-                "id": str(i).zfill(8),
                 "author": self.faker.name(),
                 "content": self.faker.text()
             }
