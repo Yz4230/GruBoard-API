@@ -104,7 +104,7 @@ curl --location --request POST 'http://localhost:8000/api/boards/' \
 | プロパティ名  | 制約                               | 説明                   |
 | ------------- | ---------------------------------- | ---------------------- |
 | `title`       | `required=true`, `max_length=128`  | ボードのタイトルです。 |
-| `descriptino` | `required=false`, `max_length=256` | ボードの説明です。     |
+| `description` | `required=false`, `max_length=256` | ボードの説明です。     |
 
 レスポンスは次の通りです。
 
