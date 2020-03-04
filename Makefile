@@ -5,4 +5,7 @@ migrate:
 	python manage.py migrate
 
 mkmigs:
-	python manage.py makemigrations
+	python manage.py makemigrations gruboard_api
+
+run:
+	python manage.py runserver 0.0.0.0:8000
