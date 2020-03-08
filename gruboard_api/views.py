@@ -1,5 +1,3 @@
-from pprint import pprint
-
 from rest_framework import exceptions, status
 from rest_framework import viewsets, mixins
 from rest_framework.generics import get_object_or_404
@@ -10,13 +8,14 @@ from .models import Board, Message, Role
 from .serializers import BoardSerializer, MessageSerializer, RoleSerializer
 
 
-def require_auth(board_id: str, auth: str, *required_role_types) -> Board:
+def require_auth(board_id: str, auth: str, *required_role_types) -> None:
+    if not required_role_types:
+        return
     board: Board = get_object_or_404(Board, id=board_id)
     if auth is None:
         raise exceptions.NotAuthenticated("The query 'auth' is required.")
     if not board.role_set.filter(auth=auth).filter(type__in=required_role_types).exists():
         raise exceptions.PermissionDenied("Your role is not allowed to access.")
-    return board
 
 
 class BoardViewSet(viewsets.GenericViewSet,
@@ -29,10 +28,19 @@ class BoardViewSet(viewsets.GenericViewSet,
 
     def initial(self, request: Request, *args, **kwargs):
         super().initial(request, *args, **kwargs)
-        if request.method not in ("POST", "OPTIONS"):
-            board_id = kwargs.get("pk")
-            auth = request.query_params.get("auth")
-            require_auth(board_id, auth, Role.Types.admin)
+
+        board_id = kwargs.get("pk")
+        auth = request.query_params.get("auth")
+        required_roles = []
+
+        if request.method in ("GET", "HEAD") and board_id:
+            required_roles.append(Role.Types.admin)
+            required_roles.append(Role.Types.editor)
+            required_roles.append(Role.Types.viewer)
+        elif request.method in ("PUT", "PATCH", "DELETE"):
+            required_roles.append(Role.Types.admin)
+
+        require_auth(board_id, auth, *required_roles)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

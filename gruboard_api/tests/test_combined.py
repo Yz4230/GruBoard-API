@@ -32,6 +32,11 @@ class ProperScenario(CombinedTestCase):
         res: Response = self.client.get(
             f"/api/boards/{board_id}/?auth={editor_auth}"
         )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        res: Response = self.client.put(
+            f"/api/boards/{board_id}/?auth={editor_auth}"
+        )
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
         for _ in range(10):
