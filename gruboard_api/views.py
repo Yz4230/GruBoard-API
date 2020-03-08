@@ -33,6 +33,7 @@ class BoardViewSet(viewsets.GenericViewSet,
         auth = request.query_params.get("auth")
         required_roles = []
 
+        # Don't check if method is POST and OPTIONS
         if request.method in ("GET", "HEAD") and board_id:
             required_roles.append(Role.Types.admin)
             required_roles.append(Role.Types.editor)
@@ -41,19 +42,6 @@ class BoardViewSet(viewsets.GenericViewSet,
             required_roles.append(Role.Types.admin)
 
         require_auth(board_id, auth, *required_roles)
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-
-        role_serializer = RoleSerializer(instance=serializer.instance.role_set.first())
-        response_data = {
-            "created_board": serializer.data,
-            "created_role": role_serializer.data
-        }
-        return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class RoleViewSet(viewsets.ModelViewSet):

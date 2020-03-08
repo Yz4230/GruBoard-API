@@ -24,9 +24,11 @@ class IntegerEnumChoicesField(serializers.Field):
 
 
 class BoardSerializer(serializers.ModelSerializer):
+    role_info = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Board
-        fields = ("id", "title", "description", "created_at", "modified_at")
+        fields = ("id", "title", "description", "role_info", "created_at", "modified_at")
         read_only_fields = ("id", "created_at", "modified_at")
 
     def create(self, validated_data):
@@ -37,6 +39,15 @@ class BoardSerializer(serializers.ModelSerializer):
             type=Role.Types.admin
         )
         return board
+
+    def get_role_info(self, obj: Board):
+        request = self.context["request"]
+        if request.method == "POST":
+            role = obj.role_set.order_by("created_at").first()
+        else:
+            role = obj.role_set.get(auth=request.query_params["auth"])
+        serializer = RoleSerializer(role)
+        return serializer.data
 
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -70,7 +81,7 @@ class MessageSerializer(serializers.ModelSerializer):
             "created_at",
             "modified_at"
         )
-        read_only_fields = ("id", "author_role", "created_at", "modified_at")
+        read_only_fields = ("id", "created_at", "modified_at")
 
     def create(self, validated_data):
         kwargs = self.context["view"].kwargs
