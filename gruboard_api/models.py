@@ -54,7 +54,7 @@ class Role(models.Model):
 class Message(models.Model):
     author = models.CharField(max_length=64, null=False)
     author_role = models.ForeignKey(Role, on_delete=models.DO_NOTHING, null=True, related_name="+")
-    content = models.CharField(max_length=1024, null=False)
+    content = models.CharField(max_length=1024, null=True)
     board = models.ForeignKey(Board, on_delete=models.CASCADE, editable=False)
 
     id = models.CharField(primary_key=True, max_length=8, default=create_id, null=False, editable=False)
