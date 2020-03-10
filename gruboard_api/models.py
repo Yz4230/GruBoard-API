@@ -16,8 +16,8 @@ def create_auth():
 
 
 class Board(models.Model):
-    title = models.CharField(max_length=128, null=False)
-    description = models.CharField(max_length=256, null=True)
+    title = models.CharField(max_length=128, null=False, blank=False)
+    description = models.CharField(max_length=256, null=False, default="", blank=True)
 
     id = models.CharField(primary_key=True, max_length=8, default=create_id, null=False, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
@@ -37,8 +37,8 @@ class Role(models.Model):
         def items(cls):
             return [(r.name, r.name.capitalize() + " role") for r in cls]
 
-    title = models.CharField(max_length=128, null=False)
-    description = models.CharField(max_length=256, null=True)
+    title = models.CharField(max_length=128, null=False, blank=False)
+    description = models.CharField(max_length=256, null=False, default="", blank=True)
     auth = models.CharField(max_length=16, default=create_auth, null=False, editable=False)
     board = models.ForeignKey(Board, on_delete=models.CASCADE, editable=False)
     type = EnumIntegerField(enum=Types, default=Types.viewer)
@@ -52,9 +52,9 @@ class Role(models.Model):
 
 
 class Message(models.Model):
-    author = models.CharField(max_length=64, null=False)
+    author = models.CharField(max_length=64, null=False, blank=False)
     author_role = models.ForeignKey(Role, on_delete=models.DO_NOTHING, null=True, related_name="+")
-    content = models.CharField(max_length=1024, null=True)
+    content = models.CharField(max_length=1024, null=False, default="", blank=True)
     board = models.ForeignKey(Board, on_delete=models.CASCADE, editable=False)
 
     id = models.CharField(primary_key=True, max_length=8, default=create_id, null=False, editable=False)
