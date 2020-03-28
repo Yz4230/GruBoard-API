@@ -66,9 +66,13 @@ class RoleSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    author_role = serializers.CharField(
+    author_role_title = serializers.CharField(
         read_only=True,
         source="author_role.title"
+    )
+    author_role_type = serializers.CharField(
+        read_only=True,
+        source="author_role.type.name"
     )
 
     class Meta:
@@ -76,7 +80,8 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "author",
-            "author_role",
+            "author_role_title",
+            "author_role_type",
             "content",
             "created_at",
             "modified_at"
