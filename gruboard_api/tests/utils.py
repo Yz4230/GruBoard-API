@@ -1,8 +1,10 @@
-from rest_framework.test import APITestCase
+from random import choice
+
 from faker import Faker
 from faker.providers import job, company
+from rest_framework.test import APITestCase
+
 from gruboard_api.models import Role, Board, Message
-from random import choice
 
 
 def create_test_board(board_props=None, role_props=None) -> (Board, Role):
@@ -49,10 +51,12 @@ class MessageTestCase(BoardTestCase):
         super().setUp()
         self.test_message1_props = {
             "author": "Bob",
+            "author_role": self.test_role_admin,
             "content": "Can you see me?"
         }
         self.test_message2_props = {
             "author": "Mary",
+            "author_role": self.test_role_admin,
             "content": "Cannot you see me?"
         }
         self.test_message1 = self.test_board.message_set.create(**self.test_message1_props)

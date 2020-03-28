@@ -1,8 +1,7 @@
-from rest_framework import exceptions, status
+from rest_framework import exceptions
 from rest_framework import viewsets, mixins
 from rest_framework.generics import get_object_or_404
 from rest_framework.request import Request
-from rest_framework.response import Response
 
 from .models import Board, Message, Role
 from .serializers import BoardSerializer, MessageSerializer, RoleSerializer
@@ -30,7 +29,7 @@ class BoardViewSet(viewsets.GenericViewSet,
         super().initial(request, *args, **kwargs)
 
         board_id = kwargs.get("pk")
-        auth = request.query_params.get("auth")
+        request_auth = request.query_params.get("auth")
         required_roles = []
 
         # Don't check if method is POST and OPTIONS
@@ -41,7 +40,7 @@ class BoardViewSet(viewsets.GenericViewSet,
         elif request.method in ("PUT", "PATCH", "DELETE"):
             required_roles.append(Role.Types.admin)
 
-        require_auth(board_id, auth, *required_roles)
+        require_auth(board_id, request_auth, *required_roles)
 
 
 class RoleViewSet(viewsets.ModelViewSet):
@@ -53,8 +52,8 @@ class RoleViewSet(viewsets.ModelViewSet):
     def initial(self, request, *args, **kwargs):
         super().initial(request, *args, **kwargs)
         board_id = kwargs.get("board_pk")
-        auth = request.query_params.get("auth")
-        require_auth(board_id, auth, Role.Types.admin)
+        request_auth = request.query_params.get("auth")
+        require_auth(board_id, request_auth, Role.Types.admin)
 
 
 class MessageViewSet(viewsets.ModelViewSet):
@@ -66,17 +65,24 @@ class MessageViewSet(viewsets.ModelViewSet):
     def initial(self, request: Request, *args, **kwargs):
         super().initial(request, *args, **kwargs)
         board_id = kwargs.get("board_pk")
-        auth = request.query_params.get("auth")
+        request_auth = request.query_params.get("auth")
         if request.method == "POST":
             require_auth(
-                board_id, auth,
+                board_id, request_auth,
                 Role.Types.admin,
                 Role.Types.editor
             )
         else:
             require_auth(
-                board_id, auth,
+                board_id, request_auth,
                 Role.Types.admin,
                 Role.Types.editor,
                 Role.Types.viewer
             )
+        if request.method in ("PUT", "PATCH", "DELETE"):
+            board = Board.objects.get(id=board_id)
+            message_author_role = board.message_set.get(id=kwargs.get("pk")).author_role
+            request_role = board.role_set.get(auth=request_auth)
+            print(message_author_role, request_role)
+            if message_author_role.type == Role.Types.admin and request_role.type == Role.Types.editor:
+                raise exceptions.PermissionDenied("Editor can't update Admin's posts.")
